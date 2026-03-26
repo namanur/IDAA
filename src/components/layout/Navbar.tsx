@@ -3,11 +3,13 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 export default function Navbar() {
   const [user, setUser] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -21,6 +23,12 @@ export default function Navbar() {
     return () => subscription.unsubscribe();
   }, []);
 
+  const handleSearch = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && searchQuery.trim()) {
+      router.push(`/explore?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
   const isReaderView = pathname.startsWith('/reader/');
 
   // If in Reader View, render the GST Reader Specific Navbar
@@ -31,9 +39,17 @@ export default function Navbar() {
           <Link href="/" className="text-xl font-bold text-primary tracking-tighter uppercase whitespace-nowrap">IDAA Scholar</Link>
         </div>
         <div className="flex items-center gap-6">
-          <button className="text-on-surface-variant hover:bg-surface-container-high transition-colors duration-300 p-2 rounded-lg active:scale-95">
-            <span className="material-symbols-outlined">search</span>
-          </button>
+          <div className="relative group">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm group-focus-within:text-primary transition-colors">search</span>
+            <input 
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleSearch}
+              placeholder="Search..."
+              className="bg-surface-container-high border border-white/5 rounded-full py-1.5 pl-10 pr-4 text-xs focus:ring-2 focus:ring-primary outline-none transition-all w-48 focus:w-64"
+            />
+          </div>
           <Link href="/bookmarks" className="text-primary font-bold hover:bg-surface-container-high transition-colors duration-300 p-2 rounded-lg active:scale-95">
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>bookmark</span>
           </Link>
@@ -50,7 +66,18 @@ export default function Navbar() {
         
         {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center space-x-10">
-          <Link href="/" className={`font-bold transition-all duration-300 ${pathname === '/' ? 'text-primary border-b-2 border-primary pb-1' : 'text-on-surface-variant hover:text-primary'}`}>Dashboard</Link>
+          <div className="relative">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm group-focus-within:text-primary transition-colors">search</span>
+            <input 
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleSearch}
+              placeholder="Search modules, GST, Ind AS..."
+              className="bg-surface-container-high border border-white/5 rounded-full py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary outline-none transition-all w-64 focus:w-80"
+            />
+          </div>
+          <Link href="/" className={`font-bold transition-all duration-300 ${pathname === '/' ? 'text-primary' : 'text-on-surface-variant hover:text-primary'}`}>Dashboard</Link>
           <Link href="/category" className={`font-semibold transition-all duration-300 ${pathname.startsWith('/category') ? 'text-primary' : 'text-on-surface-variant hover:text-primary'}`}>Modules</Link>
           <Link href="/bookmarks" className={`font-semibold transition-all duration-300 ${pathname === '/bookmarks' ? 'text-primary' : 'text-on-surface-variant hover:text-primary'}`}>Bookmarks</Link>
           <Link href="/admin" className={`font-semibold transition-all duration-300 ${pathname === '/admin' ? 'text-primary' : 'text-on-surface-variant hover:text-primary'}`}>Console</Link>

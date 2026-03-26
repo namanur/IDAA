@@ -37,7 +37,7 @@ async function seed() {
         category: module.name,
         release_date: releaseDate.toISOString().split('T')[0],
         daily_slot: slot,
-        status: 'ready' // Use 'ready' instead of 'published' to match enum
+        status: 'ready' // Set all to ready permanently
       });
 
       if (error) {
