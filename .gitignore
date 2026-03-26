@@ -32,7 +32,13 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
-.env.local
+.env*.local
+
+# IDAA Temp
+stitch_idaa_web.zip
+temp.txt
+CA_Prep_Product_Doc.pdf
+
 
 # Project Specific (AI & Planning)
 GEMINI.md

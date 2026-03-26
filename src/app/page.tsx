@@ -2,158 +2,190 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { 
-  BookOpen, 
-  Clock, 
-  Lock, 
-  AlertTriangle, 
-  ChevronRight,
-  Calculator,
-  Gavel,
-  FileText,
-  BarChart3
-} from 'lucide-react';
 import Link from 'next/link';
 
 export default function Home() {
   const [topics, setTopics] = useState<any[]>([]);
+  const [profile, setProfile] = useState<any>(null);
+  const [userName, setUserName] = useState<string>("Scholar");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchTopics();
+    async function loadData() {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const fetchProfile = session?.user 
+        ? supabase.from('user_profiles').select('*').eq('id', session.user.id).single()
+        : Promise.resolve({ data: null });
+        
+      const fetchTopics = supabase.from('topics').select('*').order('release_date', { ascending: true });
+
+      const [profileRes, topicsRes] = await Promise.all([fetchProfile, fetchTopics]);
+
+      if (session?.user) {
+        setUserName(session.user.user_metadata?.full_name?.split(' ')[0] || "Scholar");
+        if (profileRes.data) setProfile(profileRes.data);
+      }
+
+      if (topicsRes.data) setTopics(topicsRes.data);
+      
+      setLoading(false);
+    }
+    
+    loadData();
   }, []);
 
-  async function fetchTopics() {
-    const { data } = await supabase
-      .from('topics')
-      .select('*')
-      .order('release_date', { ascending: true });
-    if (data) setTopics(data);
-    setLoading(false);
-  }
+  const categories = [
+    { name: 'Financial Reporting', desc: 'Mastering Ind AS, IFRS, and complex business combinations.', icon: 'account_balance' },
+    { name: 'Audit & Assurance', desc: 'Standards on Auditing, CARO 2020, and professional ethics.', icon: 'verified_user' },
+    { name: 'Taxation', desc: 'Corporate tax, GST, Transfer Pricing, and latest amendments.', icon: 'payments' },
+    { name: 'FM & Analysis', desc: 'Valuation models, cash flow analysis, and ratio interpretation.', icon: 'trending_up' }
+  ];
 
-  const categories = ['Excel', 'GST', 'TDS', 'Accounting', 'Tally'];
+  if (loading) return null;
+
+  // Derive Progress Metrics based on Topics (Mock calculations acting as hooks)
+  const totalTopics = topics.length;
+  const completedTopics = topics.filter(t => t.status === 'published' || t.status === 'completed').length; 
+  const overallProgress = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
 
   return (
-    <div className="space-y-10">
-      {/* Welcome Section */}
-      <section>
-        <h1 className="text-3xl font-bold text-[#1A237E]">Continue Learning</h1>
-        <p className="text-slate-500 mt-1">Ready for your CA Interview? Pick a topic below.</p>
-      </section>
+    <div className="w-full px-6 lg:px-12">
+      {/* Hero Header */}
+      <header className="mb-14 max-w-5xl">
+        <h1 className="text-5xl lg:text-6xl font-black leading-tight tracking-tight text-on-surface mb-3">
+          Welcome back, <span className="text-primary drop-shadow-[0_0_15px_rgba(255,193,7,0.2)]">{userName}</span>.
+        </h1>
+        <p className="text-lg text-on-surface-variant max-w-2xl leading-relaxed">
+          Your academic progress is on track. You've logged <span className="text-on-surface font-bold">{profile?.study_hours || 0} hours</span> this semester. Continue your mastery of financial fundamentals.
+        </p>
+      </header>
 
-      {/* Progress Overview (Mock data based on design) */}
-      <section className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm grid grid-cols-2 md:grid-cols-4 gap-6">
-        <ProgressItem label="Excel" percent={80} color="bg-indigo-600" />
-        <ProgressItem label="GST" percent={45} color="bg-indigo-600" />
-        <ProgressItem label="TDS" percent={20} color="bg-[#FFC107]" />
-        <ProgressItem label="Accounting" percent={0} color="bg-slate-200" />
-      </section>
-
-      {/* Module Sections */}
-      {categories.map((cat) => (
-        <section key={cat} className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-slate-800">{cat} Modules</h2>
-            <button className="text-[#1A237E] text-sm font-semibold flex items-center gap-1 hover:underline">
-              View All <ChevronRight className="w-4 h-4" />
-            </button>
+      {/* Bento Grid Dashboard */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-16 max-w-7xl">
+        {/* Circular Progress Tracker - Glassmorphic Refined */}
+        <div className="md:col-span-4 glass-card rounded-[2rem] p-8 flex flex-col items-center justify-center relative overflow-hidden group">
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 blur-[80px] rounded-full"></div>
+          
+          <div className="relative w-52 h-52 mb-6">
+            <svg className="w-full h-full transform -rotate-90">
+              <circle className="text-white/5" cx="104" cy="104" fill="transparent" r="92" stroke="currentColor" strokeWidth="12"></circle>
+              <circle 
+                className="text-primary drop-shadow-[0_0_12px_rgba(255,193,7,0.5)] transition-all duration-1000 ease-out" 
+                cx="104" cy="104" 
+                fill="transparent" r="92" 
+                stroke="currentColor" 
+                strokeDasharray="578.05" 
+                strokeDashoffset={578.05 - (578.05 * overallProgress) / 100} 
+                strokeLinecap="round" strokeWidth="12">
+              </circle>
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-5xl font-black text-on-surface tracking-tighter">{overallProgress}%</span>
+              <span className="text-[10px] uppercase font-black tracking-[0.3em] text-on-surface-variant mt-1">Overall</span>
+            </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {topics
-              .filter((t) => t.category === cat)
-              .map((topic) => (
-                <TopicCard key={topic.id} topic={topic} />
-              ))}
+          <div className="text-center">
+            <h3 className="text-xl font-bold text-on-surface mb-1">Scholar Performance</h3>
+            <p className="text-sm text-on-surface-variant font-medium">{totalTopics - completedTopics} Topics remaining to goal</p>
           </div>
-        </section>
-      ))}
-    </div>
-  );
-}
-
-function ProgressItem({ label, percent, color }: any) {
-  return (
-    <div className="space-y-2">
-      <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-slate-400">
-        <span>{label}</span>
-        <span>{percent}%</span>
-      </div>
-      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-        <div className={`h-full ${color} transition-all duration-500`} style={{ width: `${percent}%` }} />
-      </div>
-    </div>
-  );
-}
-
-function TopicCard({ topic }: { topic: any }) {
-  const isPublished = topic.status === 'published' || topic.status === 'ready';
-  const isGenerating = topic.status === 'generating' || topic.status === 'generated';
-  const isFailed = topic.status === 'failed';
-  
-  const today = new Date().toISOString().split('T')[0];
-  const isComingSoon = topic.release_date > today;
-
-  if (!isPublished && !isComingSoon && !isGenerating && !isFailed) {
-    // Basic queued state
-    return (
-      <div className="bg-white/50 border border-slate-200 p-5 rounded-xl flex items-start gap-4 opacity-60 grayscale">
-        <div className="p-3 bg-slate-100 rounded-lg text-slate-400">
-          <Lock className="w-6 h-6" />
         </div>
+
+        {/* Stats Cards Column */}
+        <div className="md:col-span-4 grid grid-rows-2 gap-6">
+          {/* Daily Streak */}
+          <div className="bg-surface-container rounded-[2rem] p-7 flex items-center justify-between group border border-white/5">
+            <div>
+              <p className="text-[10px] uppercase font-black tracking-widest text-on-surface-variant mb-2">Daily Streak</p>
+              <h4 className="text-4xl font-black text-on-surface leading-none">{profile?.current_streak || 0} <span className="text-primary text-2xl ml-1">Days</span></h4>
+            </div>
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 shadow-[inset_0_0_12px_rgba(255,193,7,0.1)]">
+              <span className="material-symbols-outlined text-primary text-3xl" style={{fontVariationSettings: "'FILL' 1"}}>local_fire_department</span>
+            </div>
+          </div>
+
+          {/* Hours Logged */}
+          <div className="bg-surface-container rounded-[2rem] p-7 flex items-center justify-between group border border-white/5">
+            <div>
+              <p className="text-[10px] uppercase font-black tracking-widest text-on-surface-variant mb-2">Study Hours</p>
+              <h4 className="text-4xl font-black text-on-surface leading-none">{profile?.study_hours || 0} <span className="text-primary text-2xl ml-1">Hrs</span></h4>
+            </div>
+            <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+              <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors text-3xl">schedule</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Performance Metrics */}
+        <div className="md:col-span-4 bg-surface-container-highest rounded-[2rem] p-8 flex flex-col relative overflow-hidden border border-white/10 shadow-2xl">
+          <h3 className="text-xl font-bold text-on-surface mb-6">Module Mastery</h3>
+          <div className="space-y-6">
+            {categories.slice(0, 3).map(cat => (
+              <div key={cat.name}>
+                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest mb-2">
+                  <span className="text-on-surface-variant">{cat.name}</span>
+                  <span className="text-primary">85%</span>
+                </div>
+                <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-full bg-primary w-[85%]"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Section Heading */}
+      <div className="flex items-end justify-between mb-10 max-w-7xl">
         <div>
-          <h3 className="font-bold text-slate-400">{topic.title}</h3>
-          <span className="text-[10px] uppercase font-bold text-slate-400">Coming Soon</span>
+          <h2 className="text-3xl font-black tracking-tight text-on-surface">Curriculum Modules</h2>
+          <p className="text-on-surface-variant text-sm mt-1 font-medium">Continuing your core curriculum.</p>
         </div>
+        <Link href="/category" className="text-primary font-bold hover:text-white transition-all flex items-center space-x-2 group">
+          <span className="border-b-2 border-primary/30 group-hover:border-primary pb-0.5">Explore All</span>
+          <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">east</span>
+        </Link>
       </div>
-    );
-  }
 
-  return (
-    <Link 
-      href={isPublished ? `/reader/${topic.slug}` : '#'}
-      className={`group bg-white border p-5 rounded-xl flex items-start gap-4 transition-all ${
-        isPublished 
-          ? 'border-slate-200 hover:border-[#1A237E] hover:shadow-md cursor-pointer' 
-          : 'border-slate-200 opacity-80 cursor-default'
-      }`}
-    >
-      <div className={`p-3 rounded-lg transition-colors ${
-        isPublished ? 'bg-indigo-50 text-[#1A237E]' : 'bg-slate-50 text-slate-400'
-      }`}>
-        <FileText className="w-6 h-6" />
+      {/* Module Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl">
+        {categories.map((cat, index) => {
+          const catTopics = topics.filter(t => t.category === cat.name);
+          const activeTopics = catTopics.filter(t => t.status === 'published' || t.status === 'ready');
+          
+          const progressPercent = catTopics.length > 0 ? Math.round((activeTopics.length / catTopics.length) * 100) : 0;
+          const isHighlighted = index === 2; // For visual variety based on the prompt UI
+
+          return (
+            <Link key={cat.name} href={`/category/${cat.name.toLowerCase()}`} className={`rounded-[2rem] p-7 group cursor-pointer transition-all duration-300 ${isHighlighted ? 'bg-surface-container border-2 border-primary/30 hover:border-primary relative overflow-hidden shadow-xl shadow-primary/5' : 'bg-surface-container hover:bg-surface-container-high border border-white/5'}`}>
+              
+              {isHighlighted && (
+                <div className="absolute top-0 right-0 p-4">
+                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                </div>
+              )}
+
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all duration-500 shadow-sm ${isHighlighted ? 'bg-primary text-on-primary shadow-[0_0_20px_rgba(255,193,7,0.3)]' : 'bg-surface-container-highest group-hover:bg-primary group-hover:text-on-primary'}`}>
+                <span className="material-symbols-outlined">{cat.icon}</span>
+              </div>
+              
+              <h4 className={`text-lg mb-2 ${isHighlighted ? 'font-extrabold text-on-surface' : 'font-bold text-on-surface group-hover:text-primary transition-colors'}`}>{cat.name}</h4>
+              <p className="text-sm text-on-surface-variant mb-8 line-clamp-2 leading-relaxed">{cat.desc}</p>
+              
+              <div className="space-y-3">
+                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                  <span className="text-on-surface-variant">Progress ({activeTopics.length}/{catTopics.length})</span>
+                  <span className="text-primary">{progressPercent}%</span>
+                </div>
+                <div className="h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+                  <div className="h-full bg-primary transition-all duration-1000" style={{width: `${progressPercent}%`, boxShadow: progressPercent > 0 ? '0 0 8px rgba(255,193,7,0.3)' : 'none'}}></div>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
       </div>
-      
-      <div className="flex-1 min-w-0">
-        <h3 className={`font-bold truncate ${isPublished ? 'text-slate-800' : 'text-slate-500'}`}>
-          {topic.title}
-        </h3>
-        
-        <div className="flex items-center gap-2 mt-1">
-          {isPublished ? (
-            <span className="text-xs text-indigo-600 font-semibold flex items-center gap-1">
-              <BookOpen className="w-3 h-3" /> Ready to read
-            </span>
-          ) : isGenerating ? (
-            <span className="text-xs text-amber-600 font-semibold flex items-center gap-1 animate-pulse">
-              <Clock className="w-3 h-3" /> Refining content...
-            </span>
-          ) : isComingSoon ? (
-            <span className="text-[10px] bg-slate-100 px-2 py-0.5 rounded text-slate-500 font-bold uppercase tracking-tight">
-              Expected {topic.release_date}
-            </span>
-          ) : isFailed ? (
-            <span className="text-xs text-red-500 font-semibold flex items-center gap-1">
-              <AlertTriangle className="w-3 h-3" /> Research delayed
-            </span>
-          ) : null}
-        </div>
-      </div>
-      
-      {isPublished && (
-        <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-[#1A237E] transition-colors" />
-      )}
-    </Link>
+    </div>
   );
 }

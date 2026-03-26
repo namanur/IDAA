@@ -45,8 +45,8 @@ export default function AuthForm({ type }: { type: 'login' | 'signup' }) {
   };
 
   return (
-    <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-sm border border-slate-200">
-      <h2 className="text-2xl font-bold text-[#1A237E] mb-6">
+    <div className="w-full max-w-md p-8 bg-white rounded-xl shadow-sm border border-slate-200">
+      <h2 className="text-2xl font-bold text-slate-900 tracking-tight mb-6">
         {type === 'login' ? 'Welcome Back' : 'Create Account'}
       </h2>
       
@@ -57,7 +57,7 @@ export default function AuthForm({ type }: { type: 'login' | 'signup' }) {
             <input
               type="text"
               required
-              className="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-[#1A237E] focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none transition-all"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Naman"
@@ -70,7 +70,7 @@ export default function AuthForm({ type }: { type: 'login' | 'signup' }) {
           <input
             type="email"
             required
-            className="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-[#1A237E] focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none transition-all"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="naman@example.com"
@@ -82,7 +82,7 @@ export default function AuthForm({ type }: { type: 'login' | 'signup' }) {
           <input
             type="password"
             required
-            className="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-[#1A237E] focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none transition-all"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
@@ -94,7 +94,7 @@ export default function AuthForm({ type }: { type: 'login' | 'signup' }) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-[#1A237E] text-white py-2 rounded-md font-semibold hover:bg-[#151c63] transition-colors flex items-center justify-center gap-2"
+          className="w-full bg-indigo-600 text-white py-2 rounded-md font-semibold hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2"
         >
           {loading && <Loader2 className="w-4 h-4 animate-spin" />}
           {type === 'login' ? 'Sign In' : 'Sign Up'}
@@ -103,9 +103,9 @@ export default function AuthForm({ type }: { type: 'login' | 'signup' }) {
 
       <div className="mt-6 text-center text-sm text-slate-600">
         {type === 'login' ? (
-          <p>Don't have an account? <a href="/signup" className="text-[#1A237E] font-medium hover:underline">Sign Up</a></p>
+          <p>Don't have an account? <a href="/signup" className="text-indigo-600 font-medium hover:underline">Sign Up</a></p>
         ) : (
-          <p>Already have an account? <a href="/login" className="text-[#1A237E] font-medium hover:underline">Sign In</a></p>
+          <p>Already have an account? <a href="/login" className="text-indigo-600 font-medium hover:underline">Sign In</a></p>
         )}
       </div>
     </div>

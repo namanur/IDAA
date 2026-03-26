@@ -2,19 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { 
-  Play, 
-  Edit3, 
-  CheckCircle, 
-  AlertCircle, 
-  Clock, 
-  BarChart3, 
-  Activity,
-  Zap,
-  Loader2,
-  RefreshCcw
-} from 'lucide-react';
-
 import { triggerResearch, syncResearchStatus } from '@/lib/actions/research';
 
 export default function AdminDashboard() {
@@ -30,9 +17,7 @@ export default function AdminDashboard() {
   async function handleTrigger(id: string) {
     setProcessingId(id);
     const result = await triggerResearch(id);
-    if (!result.success) {
-      alert(result.error);
-    }
+    if (!result.success) alert(result.error);
     await fetchTopics();
     setProcessingId(null);
   }
@@ -40,193 +25,180 @@ export default function AdminDashboard() {
   async function handleSync(id: string) {
     setProcessingId(id);
     const result = await syncResearchStatus(id);
-    if (!result.success && result.status !== 'in_progress') {
-      alert(result.error);
-    } else if (result.status === 'completed') {
-      alert('Research Completed!');
-    } else {
-      alert('Still in progress...');
-    }
+    if (!result.success && result.status !== 'in_progress') alert(result.error);
     await fetchTopics();
     setProcessingId(null);
   }
 
   async function handlePublish(id: string) {
-    const { error } = await supabase
-      .from('topics')
-      .update({ status: 'ready' }) // Admin marks as ready, published logic handles release_date
-      .eq('id', id);
-    
+    const { error } = await supabase.from('topics').update({ status: 'ready' }).eq('id', id);
     if (error) alert(error.message);
     await fetchTopics();
   }
 
   async function fetchTopics() {
-    const { data, error } = await supabase
-      .from('topics')
-      .select('*')
-      .order('release_date', { ascending: true });
-
+    const { data } = await supabase.from('topics').select('*').order('release_date', { ascending: true });
     if (data) {
       setTopics(data);
       const ready = data.filter(t => t.status === 'ready' || t.status === 'published').length;
       const failed = data.filter(t => t.status === 'failed').length;
-      setStats({
-        total: data.length,
-        ready,
-        failed,
-        pending: data.length - ready - failed
-      });
+      setStats({ total: data.length, ready, failed, pending: data.length - ready - failed });
     }
     setLoading(false);
   }
 
   const getStatusBadge = (status: string) => {
     const styles: any = {
-      queued: 'bg-slate-100 text-slate-600',
-      generating: 'bg-amber-100 text-amber-700 animate-pulse',
-      generated: 'bg-blue-100 text-blue-700',
-      reviewing: 'bg-purple-100 text-purple-700',
-      ready: 'bg-emerald-100 text-emerald-700',
-      published: 'bg-indigo-100 text-indigo-700',
-      failed: 'bg-red-100 text-red-700'
+      queued: 'bg-surface-container-highest text-on-surface',
+      generating: 'bg-primary-container/20 border border-primary text-primary animate-pulse',
+      generated: 'bg-tertiary-container text-on-tertiary-container',
+      reviewing: 'bg-secondary-container text-on-secondary-container',
+      ready: 'bg-emerald-500/20 text-emerald-400',
+      published: 'bg-secondary-container text-on-secondary-container',
+      failed: 'bg-error-container text-on-error-container'
     };
     return (
-      <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${styles[status] || styles.queued}`}>
-        {status.toUpperCase()}
+      <span className={`px-2 py-0.5 text-[10px] font-bold rounded uppercase ${styles[status] || styles.queued}`}>
+        {status}
       </span>
     );
   };
 
+  if (loading) return null;
+
   return (
-    <div className="space-y-8">
-      {/* Header & Stats */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-[#1A237E]">Admin Console</h1>
-          <p className="text-slate-500">Manage your 60-day content pipeline</p>
-        </div>
-        
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard icon={<Clock className="w-4 h-4" />} label="Total" value={stats.total} color="text-slate-600" />
-          <StatCard icon={<CheckCircle className="w-4 h-4" />} label="Ready" value={stats.ready} color="text-emerald-600" />
-          <StatCard icon={<Activity className="w-4 h-4" />} label="Pending" value={stats.pending} color="text-amber-600" />
-          <StatCard icon={<AlertCircle className="w-4 h-4" />} label="Failed" value={stats.failed} color="text-red-600" />
-        </div>
-      </div>
-
-      {/* Observability Mini Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded-lg border border-slate-200 flex items-center gap-4">
-          <div className="p-2 bg-indigo-50 rounded-lg"><Zap className="w-5 h-5 text-indigo-600" /></div>
-          <div>
-            <p className="text-xs text-slate-500 uppercase font-bold">API Health</p>
-            <p className="text-sm font-semibold">Gemini Flash 2.0 - Active</p>
+    <div className="w-full px-6 lg:px-12 pb-12">
+      {/* Bento Grid Header Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+        <div className="bg-surface-container p-6 rounded-xl hover:bg-surface-container-high transition-colors">
+          <p className="text-on-surface-variant text-xs uppercase tracking-widest mb-2">Total Ingested</p>
+          <h3 className="text-4xl font-extrabold text-[#FFC107]">{stats.total}</h3>
+          <div className="mt-4 flex items-center gap-2 text-primary text-xs">
+            <span className="material-symbols-outlined text-sm">trending_up</span>
+            <span>Target 60 Topics</span>
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg border border-slate-200 flex items-center gap-4">
-          <div className="p-2 bg-emerald-50 rounded-lg"><BarChart3 className="w-5 h-5 text-emerald-600" /></div>
-          <div>
-            <p className="text-xs text-slate-500 uppercase font-bold">Token Usage</p>
-            <p className="text-sm font-semibold">12% of Free Tier</p>
+        <div className="bg-surface-container p-6 rounded-xl hover:bg-surface-container-high transition-colors">
+          <p className="text-on-surface-variant text-xs uppercase tracking-widest mb-2">Processing Nodes</p>
+          <h3 className="text-4xl font-extrabold text-[#E5E2E1]">{stats.pending}</h3>
+          <div className="mt-4 flex items-center gap-2 text-on-surface-variant text-xs">
+            <span className="material-symbols-outlined text-sm text-primary" style={{fontVariationSettings: "'FILL' 1"}}>circle</span>
+            <span>Tasks queued</span>
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg border border-slate-200 flex items-center gap-4">
-          <div className="p-2 bg-amber-50 rounded-lg"><Play className="w-5 h-5 text-amber-600" /></div>
-          <div>
-            <p className="text-xs text-slate-500 uppercase font-bold">Active Tasks</p>
-            <p className="text-sm font-semibold">None</p>
+        <div className="bg-surface-container p-6 rounded-xl hover:bg-surface-container-high transition-colors">
+          <p className="text-on-surface-variant text-xs uppercase tracking-widest mb-2">Knowledge Graph</p>
+          <h3 className="text-4xl font-extrabold text-[#E5E2E1]">{stats.ready}</h3>
+          <div className="mt-4 flex items-center gap-2 text-emerald-400 text-xs">
+            <span>Production ready</span>
+          </div>
+        </div>
+        <div className="bg-surface-container-lowest border border-outline-variant/10 p-6 rounded-xl flex flex-col justify-between">
+          <p className="text-primary text-xs font-bold uppercase tracking-widest">Global Status</p>
+          <div className="flex items-center justify-between mt-4">
+            <span className="px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-full uppercase tracking-tighter">Ready</span>
+            <button className="bg-primary-container text-on-primary text-xs px-4 py-2 rounded font-bold active:scale-95 transition-transform" onClick={() => fetchTopics()}>Sync Core</button>
           </div>
         </div>
       </div>
 
-      {/* Pipeline Table */}
-      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-        <table className="w-full text-left border-collapse">
-          <thead className="bg-slate-50 border-b border-slate-200">
-            <tr>
-              <th className="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Topic</th>
-              <th className="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Module</th>
-              <th className="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Release</th>
-              <th className="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {topics.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-6 py-12 text-center text-slate-400 italic">
-                  No topics found. Run the seed script to populate.
-                </td>
-              </tr>
-            ) : (
-              topics.map((topic) => (
-                <tr key={topic.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4">
-                    <p className="font-semibold text-slate-800">{topic.title}</p>
-                    <p className="text-xs text-slate-400">{topic.slug}</p>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-600">{topic.category}</td>
-                  <td className="px-6 py-4">{getStatusBadge(topic.status)}</td>
-                  <td className="px-6 py-4 text-sm text-slate-600 font-mono">{topic.release_date}</td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex justify-end gap-2">
-                      {['queued', 'failed', 'delayed'].includes(topic.status) && (
-                        <button 
-                          onClick={() => handleTrigger(topic.id)}
-                          disabled={processingId === topic.id}
-                          className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-all disabled:opacity-50"
-                          title="Trigger Generation"
-                        >
-                          {processingId === topic.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
-                        </button>
-                      )}
-                      {topic.status === 'generating' && (
-                        <button 
-                          onClick={() => handleSync(topic.id)}
-                          disabled={processingId === topic.id}
-                          className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-md transition-all disabled:opacity-50"
-                          title="Sync Status"
-                        >
-                          {processingId === topic.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCcw className="w-4 h-4" />}
-                        </button>
-                      )}
-                      {topic.status === 'generated' && (
-                        <button 
-                          className="p-1.5 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded-md transition-all"
-                          title="Review & Edit"
-                        >
-                          <Edit3 className="w-4 h-4" />
-                        </button>
-                      )}
-                      {topic.status === 'reviewing' && (
-                        <button 
-                          onClick={() => handlePublish(topic.id)}
-                          className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-md transition-all"
-                          title="Mark as Ready"
-                        >
-                          <CheckCircle className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Pipeline Table Area */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="bg-surface-container rounded-xl overflow-hidden shadow-2xl">
+            <div className="px-6 py-5 bg-surface-container-low flex items-center justify-between">
+              <h2 className="text-xl font-bold tracking-tight text-[#E5E2E1]">Topic Pipeline</h2>
+              <div className="flex gap-2">
+                <span className="px-3 py-1 bg-surface-container-high rounded text-[10px] text-on-surface-variant">Active Engine: Gemini Flash</span>
+              </div>
+            </div>
+            <div className="overflow-x-auto h-[600px]">
+              <table className="w-full text-left border-collapse">
+                <thead className="sticky top-0 bg-surface-container z-10">
+                  <tr className="text-on-surface-variant text-xs uppercase tracking-widest border-b border-outline-variant/10">
+                    <th className="px-6 py-4 font-semibold">Identifier</th>
+                    <th className="px-6 py-4 font-semibold">Subject Context</th>
+                    <th className="px-6 py-4 font-semibold">Status</th>
+                    <th className="px-6 py-4 font-semibold text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="text-sm divide-y divide-outline-variant/5">
+                  {topics.map((topic) => (
+                    <tr key={topic.id} className="hover:bg-surface-container-high transition-colors group">
+                      <td className="px-6 py-4 font-mono text-xs text-on-surface-variant">#{topic.slug.substring(0,8)}</td>
+                      <td className="px-6 py-4 max-w-xs">
+                        <div className="font-bold text-[#E5E2E1] truncate">{topic.title}</div>
+                        <div className="text-[10px] text-on-surface-variant">{topic.category} • Module</div>
+                      </td>
+                      <td className="px-6 py-4">
+                        {getStatusBadge(topic.status)}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        {/* Action buttons mapped from specific logic needs */}
+                        {['queued', 'failed'].includes(topic.status) && (
+                          <button onClick={() => handleTrigger(topic.id)} disabled={processingId === topic.id} className="bg-primary text-on-primary text-xs px-4 py-2 rounded font-bold disabled:opacity-50 transition-all">
+                            {processingId === topic.id ? 'Starting...' : 'Trigger'}
+                          </button>
+                        )}
+                        {topic.status === 'generating' && (
+                          <button onClick={() => handleSync(topic.id)} disabled={processingId === topic.id} className="bg-tertiary text-on-tertiary text-xs px-4 py-2 rounded font-bold disabled:opacity-50 transition-all">
+                             {processingId === topic.id ? 'Syncing...' : 'Sync'}
+                          </button>
+                        )}
+                        {topic.status === 'generated' && (
+                           <button onClick={() => handlePublish(topic.id)} disabled={processingId === topic.id} className="bg-secondary-container text-on-secondary-container text-xs px-4 py-2 rounded font-bold transition-all">
+                             Review
+                           </button>
+                        )}
+                        {['reviewing', 'ready', 'published'].includes(topic.status) && (
+                          <span className="material-symbols-outlined text-emerald-400">check_circle</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
 
-function StatCard({ icon, label, value, color }: any) {
-  return (
-    <div className="bg-white p-3 px-4 rounded-lg border border-slate-200 shadow-sm flex items-center gap-3">
-      <div className={`${color}`}>{icon}</div>
-      <div>
-        <p className="text-[10px] uppercase font-bold text-slate-400 leading-none mb-1">{label}</p>
-        <p className={`text-lg font-bold leading-none ${color}`}>{value}</p>
+        {/* Observability Metrics & Sidebar */}
+        <div className="space-y-8">
+          <div className="bg-surface-container p-6 rounded-xl space-y-6 shadow-xl">
+            <h3 className="text-sm font-bold flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary">monitoring</span>
+              Observability Metrics
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between text-[10px] mb-1">
+                  <span className="text-on-surface-variant uppercase tracking-widest">Inference Latency</span>
+                  <span className="text-primary font-bold">~ 14.2s (Gen AI)</span>
+                </div>
+                <div className="h-1.5 w-full bg-surface-container-lowest rounded-full overflow-hidden">
+                  <div className="h-full bg-primary-container w-[14%] rounded-full"></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between text-[10px] mb-1">
+                  <span className="text-on-surface-variant uppercase tracking-widest">Error Rate</span>
+                  <span className="text-error font-bold">{stats.failed > 0 ? ((stats.failed/stats.total)*100).toFixed(1) : '0.0'}%</span>
+                </div>
+                <div className="h-1.5 w-full bg-surface-container-lowest rounded-full overflow-hidden">
+                  <div className="h-full bg-error rounded-full" style={{width: `${stats.failed > 0 ? ((stats.failed/stats.total)*100) : 0}%`}}></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-primary-container p-6 rounded-xl text-on-primary shadow-[0_20px_40px_rgba(255,193,7,0.15)] relative overflow-hidden group">
+            <div className="relative z-10">
+              <h4 className="text-xl font-black mb-2 leading-tight">System Notice</h4>
+              <p className="text-sm font-medium opacity-80 mb-6">Database connected and ready for Gemini Generation Tasks.</p>
+            </div>
+            <span className="material-symbols-outlined absolute -right-4 -bottom-4 text-9xl opacity-10 rotate-12 group-hover:rotate-0 transition-transform duration-700">auto_awesome</span>
+          </div>
+        </div>
       </div>
     </div>
   );

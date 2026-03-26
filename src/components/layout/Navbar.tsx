@@ -1,88 +1,67 @@
 'use client';
 
 import Link from 'next/link';
-import { Search, Flame, User, BookMarked, Home as HomeIcon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
   const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      if (session?.user) fetchProfile(session.user.id);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user) fetchProfile(session.user.id);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  async function fetchProfile(userId: string) {
-    const { data } = await supabase.from('user_profiles').select('*').eq('id', userId).single();
-    if (data) setProfile(data);
+  const isReaderView = pathname.startsWith('/reader/');
+
+  // If in Reader View, render the GST Reader Specific Navbar
+  if (isReaderView) {
+    return (
+      <header className="fixed top-0 w-full z-50 flex justify-between items-center px-8 h-16 bg-surface-dim backdrop-blur-xl bg-opacity-80 shadow-[0_48px_48px_-12px_rgba(250,189,0,0.06)] font-sans antialiased tracking-tight">
+        <div className="flex items-center gap-4">
+          <Link href="/" className="text-xl font-bold text-primary tracking-tighter uppercase whitespace-nowrap">IDAA Scholar</Link>
+        </div>
+        <div className="flex items-center gap-6">
+          <button className="text-on-surface-variant hover:bg-surface-container-high transition-colors duration-300 p-2 rounded-lg active:scale-95">
+            <span className="material-symbols-outlined">search</span>
+          </button>
+          <Link href="/bookmarks" className="text-primary font-bold hover:bg-surface-container-high transition-colors duration-300 p-2 rounded-lg active:scale-95">
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>bookmark</span>
+          </Link>
+        </div>
+      </header>
+    );
   }
 
+  // Standard Scholar Navbar
   return (
-    <nav className="fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 z-50 flex items-center justify-between px-6">
-      {/* ... Logo Section ... */}
-      <div className="flex items-center gap-2">
-        <Link href="/" className="text-2xl font-bold text-[#1A237E] tracking-tight">
-          IDAA
-        </Link>
-      </div>
-
-      {/* ... Desktop Navigation / Search ... */}
-      <div className="hidden md:flex items-center flex-1 max-w-md mx-8">
-        <div className="relative w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Search topics, GST, Excel..."
-            className="w-full bg-slate-100 border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-[#1A237E] outline-none transition-all"
-          />
+    <nav className="fixed top-0 w-full z-50 bg-[#121212]/90 backdrop-blur-xl border-b border-white/5 font-sans antialiased">
+      <div className="flex justify-between items-center px-8 py-4 w-full h-16">
+        <Link href="/" className="text-xl font-extrabold tracking-tighter text-primary whitespace-nowrap">IDAA Scholar</Link>
+        
+        {/* Desktop Navigation Links */}
+        <div className="hidden md:flex items-center space-x-10">
+          <Link href="/" className={`font-bold transition-all duration-300 ${pathname === '/' ? 'text-primary border-b-2 border-primary pb-1' : 'text-on-surface-variant hover:text-primary'}`}>Dashboard</Link>
+          <Link href="/category" className={`font-semibold transition-all duration-300 ${pathname.startsWith('/category') ? 'text-primary' : 'text-on-surface-variant hover:text-primary'}`}>Modules</Link>
+          <Link href="/bookmarks" className={`font-semibold transition-all duration-300 ${pathname === '/bookmarks' ? 'text-primary' : 'text-on-surface-variant hover:text-primary'}`}>Bookmarks</Link>
+          <Link href="/admin" className={`font-semibold transition-all duration-300 ${pathname === '/admin' ? 'text-primary' : 'text-on-surface-variant hover:text-primary'}`}>Console</Link>
         </div>
-      </div>
 
-      {/* Action Icons */}
-      <div className="flex items-center gap-4 md:gap-6">
-        {profile && (
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#FAEEDA] rounded-full">
-            <Flame className="w-4 h-4 text-[#854F0B]" fill="#FFC107" />
-            <span className="text-sm font-semibold text-[#854F0B]">{profile.current_streak || 0} Days</span>
-          </div>
-        )}
-        
-        <Link href="/bookmarks" className="text-slate-600 hover:text-[#1A237E] transition-colors">
-          <BookMarked className="w-5 h-5" />
-        </Link>
-        
-        <Link href={user ? "/profile" : "/login"}>
-          <div className="w-9 h-9 bg-slate-100 rounded-full flex items-center justify-center border border-slate-200 hover:border-[#1A237E] transition-all">
-            <User className="w-5 h-5 text-slate-600" />
-          </div>
-        </Link>
-      </div>
-
-      {/* Mobile Bottom Bar Placeholder (Visible on Mobile) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-slate-200 flex items-center justify-around px-4">
-        <Link href="/" className="flex flex-col items-center gap-1 text-[#1A237E]">
-          <HomeIcon className="w-5 h-5" />
-          <span className="text-[10px] font-medium">Home</span>
-        </Link>
-        <Link href="/weak-list" className="flex flex-col items-center gap-1 text-slate-400">
-          <Search className="w-5 h-5" />
-          <span className="text-[10px] font-medium">Weak List</span>
-        </Link>
-        <Link href="/profile" className="flex flex-col items-center gap-1 text-slate-400">
-          <User className="w-5 h-5" />
-          <span className="text-[10px] font-medium">Profile</span>
-        </Link>
+        <div className="flex items-center space-x-6">
+          <button className="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">notifications</button>
+          <Link href={user ? "/profile" : "/login"} className="h-8 w-8 rounded-full bg-surface-container-high border border-white/10 flex items-center justify-center cursor-pointer overflow-hidden hover:border-primary transition-colors">
+            <span className="material-symbols-outlined text-sm text-on-surface">person</span>
+          </Link>
+        </div>
       </div>
     </nav>
   );
