@@ -160,9 +160,18 @@ CREATE TABLE user_progress (
 
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
+DECLARE
+  assigned_role TEXT;
 BEGIN
+  IF new.email = 'namanurwar092@gmail.com' THEN
+    assigned_role := 'admin';
+  ELSE
+    assigned_role := 'student';
+  END IF;
+
   INSERT INTO public.user_profiles (id, full_name, role)
-  VALUES (new.id, new.raw_user_meta_data->>'full_name', 'student');
+  VALUES (new.id, new.raw_user_meta_data->>'full_name', assigned_role);
+  
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
