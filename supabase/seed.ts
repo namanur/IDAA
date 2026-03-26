@@ -37,7 +37,7 @@ async function seed() {
         category: module.name,
         release_date: releaseDate.toISOString().split('T')[0],
         daily_slot: slot,
-        status: topicCount === 0 ? 'published' : 'queued'
+        status: 'ready' // Use 'ready' instead of 'published' to match enum
       });
 
       if (error) {

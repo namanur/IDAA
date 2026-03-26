@@ -9,6 +9,7 @@ export function TopicCard({ topic }: { topic: any }) {
   const today = new Date().toISOString().split('T')[0];
   const isComingSoon = topic.release_date > today;
 
+  // Unblock: Allow "Coming Soon" or "Published" to render normally
   if (!isPublished && !isComingSoon && !isGenerating && !isFailed) {
     return (
       <div className="bg-surface-container border border-white/5 p-6 rounded-2xl flex items-start gap-4 opacity-70 grayscale">
@@ -17,7 +18,7 @@ export function TopicCard({ topic }: { topic: any }) {
         </div>
         <div>
           <h3 className="font-bold text-on-surface-variant truncate">{topic.title}</h3>
-          <span className="text-[10px] uppercase font-bold text-on-surface-variant tracking-widest mt-1 block">Coming Soon</span>
+          <span className="text-[10px] uppercase font-bold text-on-surface-variant tracking-widest mt-1 block">Registration Required</span>
         </div>
       </div>
     );
