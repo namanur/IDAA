@@ -9,13 +9,12 @@ export default function CategoriesPage() {
   const [loading, setLoading] = useState(true);
 
   const categories = [
-    { id: 'financial-reporting', name: 'Financial Reporting', desc: 'Mastering Ind AS, IFRS, and complex business combinations.', icon: 'account_balance' },
-    { id: 'audit-assurance', name: 'Audit & Assurance', desc: 'Standards on Auditing, CARO 2020, and professional ethics.', icon: 'verified_user' },
-    { id: 'taxation', name: 'Taxation', desc: 'Corporate tax, GST, Transfer Pricing, and latest amendments.', icon: 'payments' },
-    { id: 'corporate-law', name: 'Corporate Law', desc: 'Companies Act 2013 and SEBI Listing Regulations.', icon: 'gavel' },
-    { id: 'fm-analysis', name: 'FM & Analysis', desc: 'Valuation models, cash flow analysis, and ratio interpretation.', icon: 'trending_up' },
-    { id: 'soft-skills', name: 'Soft Skills', desc: 'Elevator pitch, STAR method, and interview behavioral prep.', icon: 'forum' },
-    { id: 'interview', name: 'Interview', desc: 'Real-world interview simulations and critical thinking exercises.', icon: 'person_search' }
+    { id: 'excel', name: 'Excel', desc: 'Master data analysis, lookup functions, and advanced reporting.', icon: 'table_chart' },
+    { id: 'gst', name: 'GST', desc: 'Input Tax Credit, RCM, and latest compliance amendments.', icon: 'account_balance' },
+    { id: 'tds', name: 'TDS', desc: 'Withholding tax sections, rates, and quarterly returns.', icon: 'payments' },
+    { id: 'accounting', name: 'Accounting', desc: 'Finalization of accounts, Ind AS, and audit preparation.', icon: 'verified_user' },
+    { id: 'tally', name: 'Tally', desc: 'Practical ERP application, inventory management, and shortcuts.', icon: 'terminal' },
+    { id: 'interview', name: 'Interview', desc: 'Real-world simulations and behavioral prep.', icon: 'person_search' }
   ];
 
   useEffect(() => {
@@ -27,11 +26,13 @@ export default function CategoriesPage() {
     loadTopics();
   }, []);
 
+  if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 rounded-full border-4 border-primary border-t-transparent animate-spin"></div></div>;
+
   return (
-    <div className="px-6 lg:px-12 py-10 w-full max-w-7xl">
+    <div className="px-6 lg:px-4 py-10 w-full max-w-7xl">
       <div className="mb-12">
         <h1 className="text-4xl lg:text-5xl font-black text-on-surface tracking-tighter mb-4">
-          All <span className="text-primary">Curriculum Modules</span>
+          Curriculum <span className="text-primary">Modules</span>
         </h1>
         <p className="text-on-surface-variant max-w-2xl font-medium leading-relaxed">
           Select a specialized module to begin your deep-dive preparation for CA interviews.
@@ -59,8 +60,8 @@ export default function CategoriesPage() {
               
               <div className="mt-auto space-y-3">
                 <div className="flex justify-between text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant">
-                  <span>Knowledge Tracked</span>
-                  <span className="text-primary">{progressPercent}%</span>
+                  <span>Module Status</span>
+                  <span className="text-primary">{progressPercent}% Ready</span>
                 </div>
                 <div className="h-1.5 w-full bg-surface-container-lowest rounded-full overflow-hidden">
                   <div 

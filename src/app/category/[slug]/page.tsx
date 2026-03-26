@@ -6,12 +6,12 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   const { slug } = await params;
   
   const titles: Record<string, string> = { 
-    'financial-reporting': 'Financial Reporting', 
-    'audit-assurance': 'Audit & Assurance', 
-    'taxation': 'Taxation', 
-    'corporate-law': 'Corporate Law',
-    'fm-analysis': 'FM & Analysis',
-    'soft-skills': 'Soft Skills'
+    'excel': 'Excel', 
+    'gst': 'GST', 
+    'tds': 'TDS', 
+    'accounting': 'Accounting',
+    'tally': 'Tally',
+    'interview': 'Interview'
   };
   const catTitle = titles[slug.toLowerCase()] || slug;
   

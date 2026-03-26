@@ -29,6 +29,11 @@ export default function Navbar() {
     }
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/login');
+  };
+
   const isReaderView = pathname.startsWith('/reader/');
 
   // If in Reader View, render the GST Reader Specific Navbar
@@ -88,27 +93,47 @@ export default function Navbar() {
 
           <div className="flex items-center space-x-6">
             <button className="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">notifications</button>
-            <Link href={user ? "/profile" : "/login"} className="h-8 w-8 rounded-full bg-surface-container-high border border-white/10 flex items-center justify-center cursor-pointer overflow-hidden hover:border-primary transition-colors">
-              <span className="material-symbols-outlined text-sm text-on-surface">person</span>
-            </Link>
+            {user ? (
+              <button 
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-high border border-white/5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant hover:text-error hover:border-error/30 transition-all"
+              >
+                <span className="material-symbols-outlined text-sm">logout</span>
+                Logout
+              </button>
+            ) : (
+              <Link href="/login" className="h-8 w-8 rounded-full bg-surface-container-high border border-white/10 flex items-center justify-center cursor-pointer overflow-hidden hover:border-primary transition-colors">
+                <span className="material-symbols-outlined text-sm text-on-surface">person</span>
+              </Link>
+            )}
           </div>
         </div>
       </nav>
 
       {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface-container/95 backdrop-blur-xl border-t border-white/5 flex items-center justify-around px-4 z-50">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface-container/95 backdrop-blur-xl border-t border-white/5 flex items-center justify-around px-2 z-50">
         <Link href="/" className={`flex flex-col items-center gap-1 ${pathname === '/' ? 'text-primary' : 'text-on-surface-variant'}`}>
           <span className="material-symbols-outlined text-xl" style={pathname === '/' ? {fontVariationSettings: "'FILL' 1"} : {}}>home</span>
-          <span className="text-[10px] font-medium uppercase tracking-widest">Home</span>
+          <span className="text-[8px] font-bold uppercase tracking-widest">Home</span>
         </Link>
-        <Link href="/weak-list" className={`flex flex-col items-center gap-1 ${pathname === '/weak-list' ? 'text-primary' : 'text-on-surface-variant'}`}>
-          <span className="material-symbols-outlined text-xl" style={pathname === '/weak-list' ? {fontVariationSettings: "'FILL' 1"} : {}}>search</span>
-          <span className="text-[10px] font-medium uppercase tracking-widest">Weak List</span>
+        <Link href="/syllabus" className={`flex flex-col items-center gap-1 ${pathname === '/syllabus' ? 'text-primary' : 'text-on-surface-variant'}`}>
+          <span className="material-symbols-outlined text-xl" style={pathname === '/syllabus' ? {fontVariationSettings: "'FILL' 1"} : {}}>event_note</span>
+          <span className="text-[8px] font-bold uppercase tracking-widest">Syllabus</span>
         </Link>
-        <Link href="/profile" className={`flex flex-col items-center gap-1 ${pathname === '/profile' ? 'text-primary' : 'text-on-surface-variant'}`}>
-          <span className="material-symbols-outlined text-xl" style={pathname === '/profile' ? {fontVariationSettings: "'FILL' 1"} : {}}>person</span>
-          <span className="text-[10px] font-medium uppercase tracking-widest">Profile</span>
+        <Link href="/bookmarks" className={`flex flex-col items-center gap-1 ${pathname === '/bookmarks' ? 'text-primary' : 'text-on-surface-variant'}`}>
+          <span className="material-symbols-outlined text-xl" style={pathname === '/bookmarks' ? {fontVariationSettings: "'FILL' 1"} : {}}>bookmark</span>
+          <span className="text-[8px] font-bold uppercase tracking-widest">Saved</span>
         </Link>
+        <Link href="/admin" className={`flex flex-col items-center gap-1 ${pathname === '/admin' ? 'text-primary' : 'text-on-surface-variant'}`}>
+          <span className="material-symbols-outlined text-xl" style={pathname === '/admin' ? {fontVariationSettings: "'FILL' 1"} : {}}>settings</span>
+          <span className="text-[8px] font-bold uppercase tracking-widest">Admin</span>
+        </Link>
+        {user && (
+          <button onClick={handleLogout} className="flex flex-col items-center gap-1 text-on-surface-variant">
+            <span className="material-symbols-outlined text-xl">logout</span>
+            <span className="text-[8px] font-bold uppercase tracking-widest">Exit</span>
+          </button>
+        )}
       </div>
     </>
   );
