@@ -44,9 +44,9 @@ const OUTPUT_FORMAT = `
 const PERSONAS: Record<string, string> = {
   Excel: `You are a Big 4 CA with 10 years of experience using Excel for financial modelling, audit workpapers, and MIS reporting in Indian corporate environments. You train fresh CA articleship students on practical Excel usage for day-one readiness.`,
 
-  GST: `You are a Senior GST Consultant and ex-GSTN officer with deep knowledge of the CGST Act 2017, all notifications up to \${FISCAL_YEAR}, and hands-on experience handling GST audits, ITC reconciliation (GSTR-2B vs books), and litigation. You have trained CA students for interviews at Big 4 and mid-tier firms.`,
+  GST: `You are a Senior GST Consultant and ex-GSTN officer with deep knowledge of the CGST Act 2017, all notifications up to ${FISCAL_YEAR}, and hands-on experience handling GST audits, ITC reconciliation (GSTR-2B vs books), and litigation. You have trained CA students for interviews at Big 4 and mid-tier firms.`,
 
-  TDS: `You are a Chartered Accountant specialising in Direct Tax, specifically TDS/TCS compliance under the Income Tax Act 1961. You are current on all Finance Act \${FISCAL_YEAR} amendments, new TDS sections, threshold changes, and TRACES filing procedures. You have advised 50+ corporates on TDS risk and trained hundreds of CA students.`,
+  TDS: `You are a Chartered Accountant specialising in Direct Tax, specifically TDS/TCS compliance under the Income Tax Act 1961. You are current on all Finance Act ${FISCAL_YEAR} amendments, new TDS sections, threshold changes, and TRACES filing procedures. You have advised 50+ corporates on TDS risk and trained hundreds of CA students.`,
 
   Accounting: `You are a Technical Director at a Big 4 firm specialising in Indian Accounting Standards (Ind AS), ICAI Guidance Notes, and Statutory Audit. You have deep practical experience with schedule III disclosures, consolidation, and audit committee presentations. You prepare CA students for technical accounting interview rounds.`,
 
@@ -80,9 +80,9 @@ const STRUCTURES: Record<string, string> = {
 2. **Statutory Foundation** — exact section/rule of CGST Act / IGST Act / Rules that governs this topic. Quote the provision heading and sub-section numbers.
 3. **Concept in Plain Language** — for a student seeing this first time.
 4. **Detailed Technical Analysis** — full legal framework, conditions, exceptions, provisos.
-5. **Compliance Calendar & Due Dates** — specific to this topic for FY \${FISCAL_YEAR}.
+5. **Compliance Calendar & Due Dates** — specific to this topic for FY ${FISCAL_YEAR}.
 6. **5–8 Worked Examples** — include inter-state vs intra-state cases, B2B vs B2C, special category scenarios as relevant. Use a ₹-denominated table to show computation.
-7. **Recent Notifications & Circulars** — list the most impactful ones (up to \${FISCAL_YEAR}) with notification number and one-line impact.
+7. **Recent Notifications & Circulars** — list the most impactful ones (up to ${FISCAL_YEAR}) with notification number and one-line impact.
 8. **Common Interview Traps** — 5 conceptual mistakes candidates make, with correct position.
 9. **20 Interview Q&A** — mix of definition, computation, scenario-based, and amendment-based questions; detailed model answers.
 10. **Quick-Revision Cheatsheet** — rates, thresholds, due dates, and key rules in a single table.
@@ -96,7 +96,7 @@ const STRUCTURES: Record<string, string> = {
 4. **Rate Table** — a Markdown table showing: Nature of Payment | Section | Threshold (₹) | TDS Rate (Resident) | TDS Rate (Non-Resident / Foreign Co.) | Surcharge applicability.
 5. **Step-by-Step Deduction Mechanics** — when to deduct, base of deduction, timing (credit vs payment), deposit due dates.
 6. **5–7 Worked Examples** — varied: salary, contractor, rent, professional fees, NRI payment, etc. Show gross amount, exemption/threshold, net TDS, and TDS deposit timeline.
-7. **Finance Act \${FISCAL_YEAR} Amendments** — specific changes to rates, thresholds, new sections, or removed sections introduced this year.
+7. **Finance Act ${FISCAL_YEAR} Amendments** — specific changes to rates, thresholds, new sections, or removed sections introduced this year.
 8. **TRACES & Compliance** — TDS return filing, Form 16/16A/27Q, correction statements, and interest/penalty for default.
 9. **Common Interview Traps** — 5 areas where candidates confuse sections or rates.
 10. **20 Interview Q&A** — coverage of definition, computation, filing, and amendment questions with model answers.
@@ -160,7 +160,7 @@ const CATEGORY_CONTEXT: Record<string, string> = {
 `.trim(),
 
   GST: `
-- All rates and thresholds must reflect GST Council decisions up to FY \${FISCAL_YEAR}.
+- All rates and thresholds must reflect GST Council decisions up to FY ${FISCAL_YEAR}.
 - Always specify: CGST + SGST vs IGST treatment.
 - For every example, state: place of supply, nature of supply (goods/services), and whether input tax credit is available.
 - Mention relevant GSTR form where transaction appears (GSTR-1, GSTR-3B, GSTR-9, etc.).
@@ -168,7 +168,7 @@ const CATEGORY_CONTEXT: Record<string, string> = {
 `.trim(),
 
   TDS: `
-- All rates must be sourced from Income Tax Act and Finance Act \${FISCAL_YEAR}; note any proposed vs enacted changes.
+- All rates must be sourced from Income Tax Act and Finance Act ${FISCAL_YEAR}; note any proposed vs enacted changes.
 - Distinguish between TDS (deduction at source) and advance tax; students often confuse them.
 - Always mention PAN-linked rate and higher rate for non-PAN / non-Aadhaar cases.
 - Include impact of tax treaties (DTAA) for NRI/foreign payment sections.
@@ -176,7 +176,7 @@ const CATEGORY_CONTEXT: Record<string, string> = {
 `.trim(),
 
   Accounting: `
-- All Ind AS references must use current \${ICAI_REF} notified standards.
+- All Ind AS references must use current ${ICAI_REF} notified standards.
 - Where a standard has a "carve-out" from IFRS, mention it explicitly.
 - Distinguish between Ind AS applicability (Phase I, II, voluntary) and AS applicability.
 - All journal entries must use proper Schedule III ledger nomenclature.
@@ -212,23 +212,23 @@ export function buildResearchPrompt(topic: TopicRecord): string {
   const structure = STRUCTURES[category] ?? STRUCTURES['Accounting'];
   const context = CATEGORY_CONTEXT[category] ?? '';
 
-  return \`
-\${persona}
+  return `
+${persona}
 
 Your task is to write a comprehensive, examiner-grade study guide on the following topic for CA Intermediate / CA Final students preparing for their first job interview at a Big 4, Grant Thornton, BDO, or leading Indian CA firm:
 
-**Topic: "\${topic.title}"**
-**Module: \${category}**
+**Topic: "${topic.title}"**
+**Module: ${category}**
 **Target Reader: CA student / fresh articleship-completed candidate**
-**Fiscal Year Reference: \${FISCAL_YEAR}**
+**Fiscal Year Reference: ${FISCAL_YEAR}**
 
-\${structure}
+${structure}
 
 **Category-specific rules to follow:**
-\${context}
+${context}
 
-\${OUTPUT_FORMAT}
-\`.trim();
+${OUTPUT_FORMAT}
+`.trim();
 }
 
 // ─────────────────────────────────────────────
@@ -243,20 +243,20 @@ export function buildDatasetPrompt(topic: TopicRecord): string {
   const category = topic.category;
 
   const exerciseTypeByCategory: Record<string, string> = {
-    Excel: \`Excel formula exercises (VLOOKUP, SUMIF, XLOOKUP, Pivot, etc.) where the expected_formula is an actual Excel formula string.\`,
-    GST: \`GST computation exercises: ITC eligibility, liability calculation, GSTR reconciliation, RCM computation. expected_formula should be a step-by-step calculation (e.g., "IGST = Taxable Value × 18% = ₹X").\`,
-    TDS: \`TDS deduction exercises: identify section, compute TDS amount, determine deposit due date. expected_formula should be: "TDS = Gross Payment × Rate% = ₹X; due by [date]".\`,
-    Accounting: \`Journal entry exercises: identify correct debit/credit, Ind AS basis, and disclosure impact. expected_formula should be journal entry in "Dr [Account] ₹X / Cr [Account] ₹X" format.\`,
-    Tally: \`Tally voucher entry exercises: identify voucher type, ledger names, and menu path. expected_formula should be: "Voucher: [type] | Dr: [ledger] ₹X | Cr: [ledger] ₹X | Path: [menu path]".\`,
-    Interview: \`Answer-framing exercises: given an interview question, identify which framework to use (STAR/technical/opinion) and the 3 key points to hit. expected_formula should be: "Framework: STAR | Hook: [1 sentence] | Core: [2–3 points] | Close: [1 sentence]".\`,
+    Excel: `Excel formula exercises (VLOOKUP, SUMIF, XLOOKUP, Pivot, etc.) where the expected_formula is an actual Excel formula string.`,
+    GST: `GST computation exercises: ITC eligibility, liability calculation, GSTR reconciliation, RCM computation. expected_formula should be a step-by-step calculation (e.g., "IGST = Taxable Value × 18% = ₹X").`,
+    TDS: `TDS deduction exercises: identify section, compute TDS amount, determine deposit due date. expected_formula should be: "TDS = Gross Payment × Rate% = ₹X; due by [date]".`,
+    Accounting: `Journal entry exercises: identify correct debit/credit, Ind AS basis, and disclosure impact. expected_formula should be journal entry in "Dr [Account] ₹X / Cr [Account] ₹X" format.`,
+    Tally: `Tally voucher entry exercises: identify voucher type, ledger names, and menu path. expected_formula should be: "Voucher: [type] | Dr: [ledger] ₹X | Cr: [ledger] ₹X | Path: [menu path]".`,
+    Interview: `Answer-framing exercises: given an interview question, identify which framework to use (STAR/technical/opinion) and the 3 key points to hit. expected_formula should be: "Framework: STAR | Hook: [1 sentence] | Core: [2–3 points] | Close: [1 sentence]".`,
   };
 
   const exerciseType = exerciseTypeByCategory[category] ?? exerciseTypeByCategory['Accounting'];
 
-  return \`
-Generate a realistic practice dataset for a CA student studying: "\${topic.title}" (Module: \${category}).
+  return `
+Generate a realistic practice dataset for a CA student studying: "${topic.title}" (Module: ${category}).
 
-The dataset must use real Indian company names, Indian amounts (₹), and scenarios relevant to \${category} work in India.
+The dataset must use real Indian company names, Indian amounts (₹), and scenarios relevant to ${category} work in India.
 
 Return ONLY a JSON object in this exact shape — no markdown, no explanation, no backticks:
 {
@@ -279,13 +279,13 @@ Return ONLY a JSON object in this exact shape — no markdown, no explanation, n
 }
 
 Dataset requirements:
-- 15–20 rows of realistic Indian accounting/business data for "\${topic.title}".
+- 15–20 rows of realistic Indian accounting/business data for "${topic.title}".
 - Columns should match what a CA would actually see in a working file (e.g., invoice numbers, GSTIN, amounts, dates, ledger names).
 - 5 exercises of varying difficulty (at least 1 easy, 2 medium, 2 hard).
-- Exercise type for this module: \${exerciseType}
+- Exercise type for this module: ${exerciseType}
 - All ₹ amounts should be realistic for an Indian SME or corporate (₹10,000 – ₹50,00,000 range).
 - Do not repeat same scenario across exercises.
-\`.trim();
+`.trim();
 }
 
 // ─────────────────────────────────────────────
