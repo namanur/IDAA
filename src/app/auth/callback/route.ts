@@ -29,7 +29,22 @@ export async function GET(request: Request) {
     );
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+      let redirectPath = next;
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session) {
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+          
+        if (profile?.role === 'admin' && redirectPath === '/') {
+          redirectPath = '/admin';
+        }
+      }
+
+      return NextResponse.redirect(`${origin}${redirectPath}`);
     }
   }
 
