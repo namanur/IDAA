@@ -7,29 +7,37 @@ import { supabase } from '@/lib/supabase';
 
 export default function Navbar() {
   const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      if (session?.user) fetchProfile(session.user.id);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) fetchProfile(session.user.id);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
+  async function fetchProfile(userId: string) {
+    const { data } = await supabase.from('user_profiles').select('*').eq('id', userId).single();
+    if (data) setProfile(data);
+  }
+
   return (
     <nav className="fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 z-50 flex items-center justify-between px-6">
-      {/* Logo Section */}
+      {/* ... Logo Section ... */}
       <div className="flex items-center gap-2">
         <Link href="/" className="text-2xl font-bold text-[#1A237E] tracking-tight">
           IDAA
         </Link>
       </div>
 
-      {/* Desktop Navigation / Search */}
+      {/* ... Desktop Navigation / Search ... */}
       <div className="hidden md:flex items-center flex-1 max-w-md mx-8">
         <div className="relative w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -43,10 +51,12 @@ export default function Navbar() {
 
       {/* Action Icons */}
       <div className="flex items-center gap-4 md:gap-6">
-        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#FAEEDA] rounded-full">
-          <Flame className="w-4 h-4 text-[#854F0B]" fill="#FFC107" />
-          <span className="text-sm font-semibold text-[#854F0B]">5 Days</span>
-        </div>
+        {profile && (
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#FAEEDA] rounded-full">
+            <Flame className="w-4 h-4 text-[#854F0B]" fill="#FFC107" />
+            <span className="text-sm font-semibold text-[#854F0B]">{profile.current_streak || 0} Days</span>
+          </div>
+        )}
         
         <Link href="/bookmarks" className="text-slate-600 hover:text-[#1A237E] transition-colors">
           <BookMarked className="w-5 h-5" />
