@@ -42,8 +42,8 @@ The palette is designed to look professional, trustworthy, and academic.
 | Transition | Trigger | Condition |
 | :--- | :--- | :--- |
 | `queued` → `generating` | Cron / Admin | `status = 'queued'` AND `active_tasks < 1` |
-| `generating` → `generated` | Gemini API Success | Version 1 created in `topic_versions` |
-| `generating` → `failed` | API Error (3x) | `generation_attempts >= 3` |
+| `generating` → `generated` | Content engine success | Version 1 created in `topic_versions` |
+| `generating` → `failed` | Processing Error (3x) | `generation_attempts >= 3` |
 | `generated` → `reviewing` | Admin Opens | Admin enters "Review UI" |
 | `reviewing` → `ready` | Admin Approve | `current_version_id` assigned; review notes saved |
 | `ready` → `published` | Time Logic | `release_date <= now()` AND `status = 'ready'` |
@@ -52,4 +52,4 @@ The palette is designed to look professional, trustworthy, and academic.
 ## 💰 Monetization / Fallback UI
 - **Banner**: Amber background (`#FAEEDA`), Brown text (`#633806`).
 - **CTA**: Clear "Email to Unlock" button + UPI QR code placeholder.
-- **Transparency**: Honest messaging about AI limits.
+- **Transparency**: Honest messaging about processing limits.
