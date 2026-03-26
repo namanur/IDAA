@@ -14,7 +14,8 @@ export default function CategoriesPage() {
     { id: 'taxation', name: 'Taxation', desc: 'Corporate tax, GST, Transfer Pricing, and latest amendments.', icon: 'payments' },
     { id: 'corporate-law', name: 'Corporate Law', desc: 'Companies Act 2013 and SEBI Listing Regulations.', icon: 'gavel' },
     { id: 'fm-analysis', name: 'FM & Analysis', desc: 'Valuation models, cash flow analysis, and ratio interpretation.', icon: 'trending_up' },
-    { id: 'soft-skills', name: 'Soft Skills', desc: 'Elevator pitch, STAR method, and interview behavioral prep.', icon: 'forum' }
+    { id: 'soft-skills', name: 'Soft Skills', desc: 'Elevator pitch, STAR method, and interview behavioral prep.', icon: 'forum' },
+    { id: 'interview', name: 'Interview', desc: 'Real-world interview simulations and critical thinking exercises.', icon: 'person_search' }
   ];
 
   useEffect(() => {

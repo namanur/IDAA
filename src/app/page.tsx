@@ -3,10 +3,12 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
+import { TopicCard } from '@/components/TopicCard';
 
 export default function Home() {
   const [topics, setTopics] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(null);
+  const [userProgress, setUserProgress] = useState<any[]>([]);
   const [userName, setUserName] = useState<string>("Scholar");
   const [loading, setLoading] = useState(true);
 
@@ -20,11 +22,16 @@ export default function Home() {
         
       const fetchTopics = supabase.from('topics').select('*').order('release_date', { ascending: true });
 
-      const [profileRes, topicsRes] = await Promise.all([fetchProfile, fetchTopics]);
+      const fetchUserProgress = session?.user
+        ? supabase.from('user_progress').select('*').eq('user_id', session.user.id)
+        : Promise.resolve({ data: [] });
+
+      const [profileRes, topicsRes, progressRes] = await Promise.all([fetchProfile, fetchTopics, fetchUserProgress]);
 
       if (session?.user) {
         setUserName(session.user.user_metadata?.full_name?.split(' ')[0] || "Scholar");
         if (profileRes.data) setProfile(profileRes.data);
+        if (progressRes.data) setUserProgress(progressRes.data);
       }
 
       if (topicsRes.data) setTopics(topicsRes.data);
@@ -36,17 +43,19 @@ export default function Home() {
   }, []);
 
   const categories = [
-    { name: 'Financial Reporting', desc: 'Mastering Ind AS, IFRS, and complex business combinations.', icon: 'account_balance' },
-    { name: 'Audit & Assurance', desc: 'Standards on Auditing, CARO 2020, and professional ethics.', icon: 'verified_user' },
-    { name: 'Taxation', desc: 'Corporate tax, GST, Transfer Pricing, and latest amendments.', icon: 'payments' },
-    { name: 'FM & Analysis', desc: 'Valuation models, cash flow analysis, and ratio interpretation.', icon: 'trending_up' }
+    { name: 'Excel', desc: 'Master data analysis, lookup functions, and advanced reporting.', icon: 'table_chart' },
+    { name: 'GST', desc: 'Input Tax Credit, RCM, and latest compliance amendments.', icon: 'account_balance' },
+    { name: 'TDS', desc: 'Withholding tax sections, rates, and quarterly returns.', icon: 'payments' },
+    { name: 'Accounting', desc: 'Finalization of accounts, Ind AS, and audit preparation.', icon: 'verified_user' },
+    { name: 'Tally', desc: 'Practical ERP application, inventory management, and shortcuts.', icon: 'terminal' },
+    { name: 'Interview', desc: 'Real-world simulations and critical thinking exercises.', icon: 'person_search' }
   ];
 
   if (loading) return null;
 
-  // Derive Progress Metrics based on Topics (Mock calculations acting as hooks)
+  // Derive Progress Metrics based on real user progress
   const totalTopics = topics.length;
-  const completedTopics = topics.filter(t => t.status === 'published' || t.status === 'completed').length; 
+  const completedTopics = userProgress.filter(p => p.status === 'completed').length; 
   const overallProgress = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
 
   return (
@@ -123,8 +132,9 @@ export default function Home() {
           <div className="space-y-6">
             {categories.slice(0, 3).map(cat => {
               const catTopics = topics.filter(t => t.category === cat.name);
-              const activeCount = catTopics.filter(t => t.status === 'published' || t.status === 'ready').length;
-              const percent = catTopics.length > 0 ? Math.round((activeCount / catTopics.length) * 100) : 0;
+              const catTopicIds = catTopics.map(t => t.id);
+              const completedCount = userProgress.filter(p => catTopicIds.includes(p.topic_id) && p.status === 'completed').length;
+              const percent = catTopics.length > 0 ? Math.round((completedCount / catTopics.length) * 100) : 0;
               
               return (
                 <div key={cat.name}>
@@ -155,16 +165,17 @@ export default function Home() {
       </div>
 
       {/* Module Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mb-20">
         {categories.map((cat, index) => {
           const catTopics = topics.filter(t => t.category === cat.name);
-          const activeTopics = catTopics.filter(t => t.status === 'published' || t.status === 'ready');
+          const catTopicIds = catTopics.map(t => t.id);
+          const completedCount = userProgress.filter(p => catTopicIds.includes(p.topic_id) && p.status === 'completed').length;
           
-          const progressPercent = catTopics.length > 0 ? Math.round((activeTopics.length / catTopics.length) * 100) : 0;
+          const progressPercent = catTopics.length > 0 ? Math.round((completedCount / catTopics.length) * 100) : 0;
           const isHighlighted = index === 2; // For visual variety based on the prompt UI
 
           return (
-            <Link key={cat.name} href={`/category/${cat.name.toLowerCase()}`} className={`rounded-[2rem] p-7 group cursor-pointer transition-all duration-300 ${isHighlighted ? 'bg-surface-container border-2 border-primary/30 hover:border-primary relative overflow-hidden shadow-xl shadow-primary/5' : 'bg-surface-container hover:bg-surface-container-high border border-white/5'}`}>
+            <Link key={cat.name} href={`/category/${cat.name.toLowerCase().replace(/\s+/g, '-')}`} className={`rounded-[2rem] p-7 group cursor-pointer transition-all duration-300 ${isHighlighted ? 'bg-surface-container border-2 border-primary/30 hover:border-primary relative overflow-hidden shadow-xl shadow-primary/5' : 'bg-surface-container hover:bg-surface-container-high border border-white/5'}`}>
               
               {isHighlighted && (
                 <div className="absolute top-0 right-0 p-4">
@@ -181,7 +192,7 @@ export default function Home() {
               
               <div className="space-y-3">
                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
-                  <span className="text-on-surface-variant">Progress ({activeTopics.length}/{catTopics.length})</span>
+                  <span className="text-on-surface-variant">Progress ({completedCount}/{catTopics.length})</span>
                   <span className="text-primary">{progressPercent}%</span>
                 </div>
                 <div className="h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
@@ -191,6 +202,21 @@ export default function Home() {
             </Link>
           );
         })}
+      </div>
+
+      {/* Interview Modules Section */}
+      <div className="mb-20">
+        <div className="flex justify-between items-end mb-8">
+          <div>
+            <h2 className="text-3xl font-black text-on-surface tracking-tighter">Interview Modules</h2>
+            <p className="text-on-surface-variant text-sm font-medium mt-1">Real-world simulations and behavioral prep.</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl">
+          {topics.filter(t => t.category === 'Interview').slice(0, 10).map((topic) => (
+            <TopicCard key={topic.id} topic={topic} />
+          ))}
+        </div>
       </div>
     </div>
   );

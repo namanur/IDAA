@@ -17,13 +17,17 @@ export default function ProfilePage() {
         return;
       }
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('user_profiles')
         .select('*')
         .eq('id', session.user.id)
         .single();
       
-      if (data) setProfile(data);
+      if (error) {
+        console.error('Failed to load profile:', error);
+      } else if (data) {
+        setProfile(data);
+      }
       setLoading(false);
     }
     loadProfile();

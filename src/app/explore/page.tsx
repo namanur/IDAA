@@ -38,9 +38,15 @@ export default function ExplorePage({ searchParams }: { searchParams: Promise<{ 
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {results.map((topic) => (
-          <TopicCard key={topic.id} topic={topic} />
-        ))}
+        {loading ? (
+          [1, 2, 3].map((i) => (
+            <div key={i} className="bg-surface-container border border-white/5 p-6 rounded-2xl h-32 animate-pulse opacity-50"></div>
+          ))
+        ) : (
+          results.map((topic) => (
+            <TopicCard key={topic.id} topic={topic} />
+          ))
+        )}
         {results.length === 0 && !loading && (
           <div className="col-span-full py-20 text-center bg-surface-container rounded-3xl border border-white/5 opacity-50">
              <p className="text-on-surface-variant font-bold">No matching topics located.</p>

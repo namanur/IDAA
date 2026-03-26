@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { triggerResearch, syncResearchStatus } from '@/lib/actions/research';
+import { triggerResearch } from '@/lib/actions/research';
 
 export default function AdminDashboard() {
   const [topics, setTopics] = useState<any[]>([]);
@@ -22,10 +22,17 @@ export default function AdminDashboard() {
     setProcessingId(null);
   }
 
-  async function handleSync(id: string) {
-    setProcessingId(id);
-    const result = await syncResearchStatus(id);
-    if (!result.success && result.status !== 'in_progress') alert(result.error);
+  async function handleGenerateAll() {
+    const queued = topics.filter(t => ['queued', 'failed'].includes(t.status));
+    if (!queued.length) return alert('No topics in queue to generate.');
+    if (!confirm(`This will trigger generation for ${queued.length} topics. Continue?`)) return;
+
+    for (const topic of queued) {
+      setProcessingId(topic.id);
+      await triggerResearch(topic.id);
+      // Small delay to avoid hammering Gemini rate limits
+      await new Promise(r => setTimeout(r, 3000));
+    }
     await fetchTopics();
     setProcessingId(null);
   }
@@ -95,9 +102,19 @@ export default function AdminDashboard() {
         </div>
         <div className="bg-surface-container-lowest border border-outline-variant/10 p-6 rounded-xl flex flex-col justify-between">
           <p className="text-primary text-xs font-bold uppercase tracking-widest">Global Status</p>
-          <div className="flex items-center justify-between mt-4">
-            <span className="px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-full uppercase tracking-tighter">Ready</span>
-            <button className="bg-primary-container text-on-primary text-xs px-4 py-2 rounded font-bold active:scale-95 transition-transform" onClick={() => fetchTopics()}>Sync Core</button>
+          <div className="flex flex-col gap-2 mt-4">
+            <div className="flex items-center justify-between">
+              <span className="px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-full uppercase tracking-tighter">Ready</span>
+              <button className="bg-primary-container text-on-primary text-xs px-4 py-2 rounded font-bold active:scale-95 transition-transform" onClick={() => fetchTopics()}>Sync Core</button>
+            </div>
+            <button 
+              onClick={handleGenerateAll}
+              disabled={processingId !== null}
+              className="w-full bg-[#1A237E] text-white py-2 rounded font-bold text-xs flex items-center justify-center gap-2 hover:bg-[#151c63] active:scale-95 transition-all disabled:opacity-50"
+            >
+              <span className="material-symbols-outlined text-sm">bolt</span>
+              Generate All Queued
+            </button>
           </div>
         </div>
       </div>
@@ -141,9 +158,7 @@ export default function AdminDashboard() {
                           </button>
                         )}
                         {topic.status === 'generating' && (
-                          <button onClick={() => handleSync(topic.id)} disabled={processingId === topic.id} className="bg-tertiary text-on-tertiary text-xs px-4 py-2 rounded font-bold disabled:opacity-50 transition-all">
-                             {processingId === topic.id ? 'Syncing...' : 'Sync'}
-                          </button>
+                          <span className="text-[10px] text-primary animate-pulse font-bold">GENERATING...</span>
                         )}
                         {topic.status === 'generated' && (
                            <button onClick={() => handlePublish(topic.id)} disabled={processingId === topic.id} className="bg-secondary-container text-on-secondary-container text-xs px-4 py-2 rounded font-bold transition-all">
