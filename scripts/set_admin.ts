@@ -38,6 +38,7 @@ async function setAdmin(email: string, password?: string) {
       user_metadata: { full_name: 'Admin' }
     });
     if (createError) throw createError;
+    if (!newUser) throw new Error('User creation returned null unexpectedly.');
     user = newUser;
   } else {
     // 2. Update existing user's role to 'admin'
