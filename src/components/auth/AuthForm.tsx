@@ -25,6 +25,7 @@ export default function AuthForm({ type }: { type: 'login' | 'signup' }) {
           password,
           options: {
             data: { full_name: fullName },
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
           },
         });
         if (error) throw error;
@@ -68,7 +69,7 @@ export default function AuthForm({ type }: { type: 'login' | 'signup' }) {
               className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all font-medium text-slate-900 placeholder:text-slate-400"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              placeholder="Naman"
+              placeholder="Your Name"
             />
           </div>
         )}
@@ -81,7 +82,7 @@ export default function AuthForm({ type }: { type: 'login' | 'signup' }) {
             className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all font-medium text-slate-900 placeholder:text-slate-400"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="naman@idaa.com"
+            placeholder="scholar@example.com"
           />
         </div>
         

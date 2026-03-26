@@ -6,11 +6,16 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   const { slug } = await params;
   
   const titles: Record<string, string> = { 
-    'excel': 'Excel', 
-    'gst': 'GST', 
-    'tds': 'TDS', 
-    'accounting': 'Accounting',
+    'financial-reporting': 'Financial Reporting', 
+    'audit-assurance': 'Audit & Assurance', 
+    'taxation': 'Taxation', 
+    'gst': 'GST',
+    'tds': 'TDS',
+    'excel': 'Excel',
     'tally': 'Tally',
+    'corporate-law': 'Corporate Law',
+    'fm-analysis': 'FM & Analysis',
+    'soft-skills': 'Soft Skills',
     'interview': 'Interview'
   };
   const catTitle = titles[slug.toLowerCase()] || slug;
@@ -22,7 +27,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
     .order('release_date', { ascending: true });
     
   return (
-     <div className="space-y-10 px-6 lg:px-12 w-full max-w-7xl pb-20">
+     <div className="space-y-10 px-6 lg:px-4 w-full max-w-7xl pb-20">
       {/* Header */}
       <div className="flex flex-col gap-2">
         <Link href="/" className="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-highest hover:bg-primary hover:text-on-primary transition-all text-on-surface mb-2">
@@ -39,7 +44,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
            <TopicCard key={topic.id} topic={topic} />
         ))}
         {(!topics || topics.length === 0) && (
-           <div className="col-span-full py-20 mt-10 text-center flex flex-col items-center justify-center bg-surface-container rounded-2xl border border-white/5">
+           <div className="col-span-full py-20 mt-10 text-center flex flex-col items-center justify-center bg-surface-container rounded-2xl border border-white/5 shadow-2xl">
              <span className="material-symbols-outlined text-primary text-4xl mb-4">search_off</span>
              <p className="text-on-surface-variant font-bold">No active materials located.</p>
              <p className="text-sm text-on-surface-variant/70 mt-1">Check back later for new module releases.</p>

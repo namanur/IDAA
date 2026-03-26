@@ -75,45 +75,54 @@ export default function AdminDashboard() {
 
   return (
     <div className="w-full px-6 lg:px-12 pb-12">
+      <div className="flex items-center gap-4 mb-8">
+        <a href="/" className="inline-flex items-center gap-2 text-on-surface-variant hover:text-primary font-bold text-xs uppercase tracking-widest transition-colors group">
+          <span className="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
+          Back to Portal
+        </a>
+        <div className="h-px flex-1 bg-outline-variant/10"></div>
+      </div>
+
       {/* Bento Grid Header Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-        <div className="bg-surface-container p-6 rounded-xl hover:bg-surface-container-high transition-colors">
-          <p className="text-on-surface-variant text-xs uppercase tracking-widest mb-2">Total Ingested</p>
-          <h3 className="text-4xl font-extrabold text-[#FFC107]">{stats.total}</h3>
-          <div className="mt-4 flex items-center gap-2 text-primary text-xs">
+        <div className="bg-surface-container p-6 rounded-xl hover:bg-surface-container-high transition-colors border border-outline-variant/5">
+          <p className="text-on-surface-variant text-[10px] font-black uppercase tracking-widest mb-2 opacity-60">Total Ingested</p>
+          <h3 className="text-4xl font-black text-amber-500">{stats.total}</h3>
+          <div className="mt-4 flex items-center gap-2 text-primary text-[10px] font-black uppercase tracking-tight">
             <span className="material-symbols-outlined text-sm">trending_up</span>
-            <span>Target 60 Topics</span>
+            <span>Target: 60 Topics</span>
           </div>
         </div>
-        <div className="bg-surface-container p-6 rounded-xl hover:bg-surface-container-high transition-colors">
-          <p className="text-on-surface-variant text-xs uppercase tracking-widest mb-2">Processing Nodes</p>
-          <h3 className="text-4xl font-extrabold text-[#E5E2E1]">{stats.pending}</h3>
-          <div className="mt-4 flex items-center gap-2 text-on-surface-variant text-xs">
+        <div className="bg-surface-container p-6 rounded-xl hover:bg-surface-container-high transition-colors border border-outline-variant/5">
+          <p className="text-on-surface-variant text-[10px] font-black uppercase tracking-widest mb-2 opacity-60">Pending Logic</p>
+          <h3 className="text-4xl font-black text-slate-300">{stats.pending}</h3>
+          <div className="mt-4 flex items-center gap-2 text-on-surface-variant text-[10px] font-black uppercase tracking-tight">
             <span className="material-symbols-outlined text-sm text-primary" style={{fontVariationSettings: "'FILL' 1"}}>circle</span>
-            <span>Tasks queued</span>
+            <span>Tasks Queued</span>
           </div>
         </div>
-        <div className="bg-surface-container p-6 rounded-xl hover:bg-surface-container-high transition-colors">
-          <p className="text-on-surface-variant text-xs uppercase tracking-widest mb-2">Knowledge Graph</p>
-          <h3 className="text-4xl font-extrabold text-[#E5E2E1]">{stats.ready}</h3>
-          <div className="mt-4 flex items-center gap-2 text-emerald-400 text-xs">
-            <span>Production ready</span>
+        <div className="bg-surface-container p-6 rounded-xl hover:bg-surface-container-high transition-colors border border-outline-variant/5">
+          <p className="text-on-surface-variant text-[10px] font-black uppercase tracking-widest mb-2 opacity-60">Production Nodes</p>
+          <h3 className="text-4xl font-black text-emerald-400">{stats.ready}</h3>
+          <div className="mt-4 flex items-center gap-2 text-emerald-400 text-[10px] font-black uppercase tracking-tight">
+            <span className="material-symbols-outlined text-sm">check_circle</span>
+            <span>Verified Ready</span>
           </div>
         </div>
-        <div className="bg-surface-container-lowest border border-outline-variant/10 p-6 rounded-xl flex flex-col justify-between">
-          <p className="text-primary text-xs font-bold uppercase tracking-widest">Global Status</p>
-          <div className="flex flex-col gap-2 mt-4">
+        <div className="bg-indigo-950 p-6 rounded-xl border border-primary/20 flex flex-col justify-between shadow-2xl shadow-primary/20">
+          <p className="text-amber-400 text-[10px] font-black uppercase tracking-widest">Global Engine</p>
+          <div className="flex flex-col gap-3 mt-4">
             <div className="flex items-center justify-between">
-              <span className="px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-full uppercase tracking-tighter">Ready</span>
-              <button className="bg-primary-container text-on-primary text-xs px-4 py-2 rounded font-bold active:scale-95 transition-transform" onClick={() => fetchTopics()}>Sync Core</button>
+              <span className="px-3 py-1 bg-amber-500/10 text-amber-400 text-[10px] font-black rounded-full uppercase tracking-tighter border border-amber-500/20">Active</span>
+              <button className="bg-amber-500 text-indigo-950 text-[10px] font-black px-4 py-2 rounded-lg hover:bg-amber-400 active:scale-95 transition-all" onClick={() => fetchTopics()}>Sync Core</button>
             </div>
             <button 
               onClick={handleGenerateAll}
               disabled={processingId !== null}
-              className="w-full bg-[#1A237E] text-white py-2 rounded font-bold text-xs flex items-center justify-center gap-2 hover:bg-[#151c63] active:scale-95 transition-all disabled:opacity-50"
+              className="w-full bg-white text-indigo-950 py-2.5 rounded-lg font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-slate-100 active:scale-95 transition-all disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-sm">bolt</span>
-              Generate All Queued
+              Deploy All
             </button>
           </div>
         </div>

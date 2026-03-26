@@ -9,12 +9,17 @@ export default function CategoriesPage() {
   const [loading, setLoading] = useState(true);
 
   const categories = [
-    { id: 'excel', name: 'Excel', desc: 'Master data analysis, lookup functions, and advanced reporting.', icon: 'table_chart' },
-    { id: 'gst', name: 'GST', desc: 'Input Tax Credit, RCM, and latest compliance amendments.', icon: 'account_balance' },
-    { id: 'tds', name: 'TDS', desc: 'Withholding tax sections, rates, and quarterly returns.', icon: 'payments' },
-    { id: 'accounting', name: 'Accounting', desc: 'Finalization of accounts, Ind AS, and audit preparation.', icon: 'verified_user' },
-    { id: 'tally', name: 'Tally', desc: 'Practical ERP application, inventory management, and shortcuts.', icon: 'terminal' },
-    { id: 'interview', name: 'Interview', desc: 'Real-world simulations and behavioral prep.', icon: 'person_search' }
+    { id: 'financial-reporting', name: 'Financial Reporting', desc: 'Ind AS, IFRS, and complex business combinations.', icon: 'account_balance' },
+    { id: 'audit-assurance', name: 'Audit & Assurance', desc: 'Standards on Auditing, CARO 2020, and professional ethics.', icon: 'verified_user' },
+    { id: 'taxation', name: 'Taxation', desc: 'Corporate tax and latest amendments.', icon: 'payments' },
+    { id: 'gst', name: 'GST', desc: 'Input Tax Credit, RCM, and compliance.', icon: 'account_balance' },
+    { id: 'tds', name: 'TDS', desc: 'Withholding tax sections, rates, and returns.', icon: 'payments' },
+    { id: 'excel', name: 'Excel', desc: 'Data analysis, lookup functions, and reporting.', icon: 'table_chart' },
+    { id: 'tally', name: 'Tally', desc: 'Practical ERP application and shortcuts.', icon: 'terminal' },
+    { id: 'corporate-law', name: 'Corporate Law', desc: 'Companies Act 2013 and SEBI regulations.', icon: 'gavel' },
+    { id: 'fm-analysis', name: 'FM & Analysis', desc: 'Valuation models and ratio interpretation.', icon: 'trending_up' },
+    { id: 'soft-skills', name: 'Soft Skills', desc: 'Elevator pitch and behavioral prep.', icon: 'forum' },
+    { id: 'interview', name: 'Interview', desc: 'Real-world simulations and critical thinking.', icon: 'person_search' }
   ];
 
   useEffect(() => {
@@ -49,7 +54,7 @@ export default function CategoriesPage() {
             <Link 
               key={cat.id} 
               href={`/category/${cat.id}`}
-              className="group bg-surface-container hover:bg-surface-container-high p-8 rounded-[2.5rem] border border-white/5 transition-all duration-300 flex flex-col h-full"
+              className="group bg-surface-container hover:bg-surface-container-high p-8 rounded-[2.5rem] border border-white/5 transition-all duration-300 flex flex-col h-full shadow-xl"
             >
               <div className="w-16 h-16 rounded-2xl bg-surface-container-highest group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center mb-6 transition-all duration-500 shadow-sm">
                 <span className="material-symbols-outlined text-3xl">{cat.icon}</span>
@@ -64,10 +69,7 @@ export default function CategoriesPage() {
                   <span className="text-primary">{progressPercent}% Ready</span>
                 </div>
                 <div className="h-1.5 w-full bg-surface-container-lowest rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-primary transition-all duration-1000" 
-                    style={{ width: `${progressPercent}%` }}
-                  ></div>
+                  <div className="h-full bg-primary transition-all duration-1000" style={{ width: `${progressPercent}%` }}></div>
                 </div>
               </div>
             </Link>

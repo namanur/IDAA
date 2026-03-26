@@ -8,7 +8,8 @@
     "build:cf": "npx @cloudflare/next-on-pages",
     "deploy": "bun run build:cf && wrangler pages deploy .vercel/output/static",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "admin:set": "bun run set_admin.ts"
   },
   "dependencies": {
     "@google/genai": "^1.46.0",
