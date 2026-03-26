@@ -2,9 +2,15 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
   // Hide standard sidebar on the Topic page since it has its own Table of Contents
   if (pathname.startsWith('/reader/')) return null;
@@ -13,7 +19,9 @@ export default function Sidebar() {
     <aside className="h-screen w-64 fixed left-0 top-0 hidden lg:flex flex-col bg-surface-container-lowest border-r border-white/5 transition-colors duration-500 font-sans text-sm font-medium z-40 pt-16">
       <div className="p-8 pb-4">
         <div className="text-lg font-black uppercase tracking-widest text-primary">The Curator</div>
-        <div className="text-[10px] text-on-surface-variant tracking-[0.2em] mt-1 uppercase">IDAA Scholar</div>
+        <div className="text-[10px] text-on-surface-variant tracking-[0.2em] mt-1 uppercase">
+          {mounted ? 'IDAA Scholar' : 'Academic Tier'}
+        </div>
       </div>
       
       <div className="flex flex-col space-y-1 p-6 h-full mt-6">

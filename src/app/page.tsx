@@ -121,17 +121,23 @@ export default function Home() {
         <div className="md:col-span-4 bg-surface-container-highest rounded-[2rem] p-8 flex flex-col relative overflow-hidden border border-white/10 shadow-2xl">
           <h3 className="text-xl font-bold text-on-surface mb-6">Module Mastery</h3>
           <div className="space-y-6">
-            {categories.slice(0, 3).map(cat => (
-              <div key={cat.name}>
-                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest mb-2">
-                  <span className="text-on-surface-variant">{cat.name}</span>
-                  <span className="text-primary">85%</span>
+            {categories.slice(0, 3).map(cat => {
+              const catTopics = topics.filter(t => t.category === cat.name);
+              const activeCount = catTopics.filter(t => t.status === 'published' || t.status === 'ready').length;
+              const percent = catTopics.length > 0 ? Math.round((activeCount / catTopics.length) * 100) : 0;
+              
+              return (
+                <div key={cat.name}>
+                  <div className="flex justify-between text-[10px] font-black uppercase tracking-widest mb-2">
+                    <span className="text-on-surface-variant">{cat.name}</span>
+                    <span className="text-primary">{percent}%</span>
+                  </div>
+                  <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-full bg-primary transition-all duration-1000" style={{ width: `${percent}%` }}></div>
+                  </div>
                 </div>
-                <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                  <div className="h-full bg-primary w-[85%]"></div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

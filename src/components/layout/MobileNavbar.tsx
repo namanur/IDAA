@@ -15,9 +15,9 @@ export default function MobileNavbar() {
           <span className="material-symbols-outlined text-2xl" style={pathname === '/' ? {fontVariationSettings: "'FILL' 1"} : {}}>dashboard</span>
           <span className={`text-[10px] mt-1 uppercase tracking-widest ${pathname === '/' ? 'font-black' : 'font-bold'}`}>Home</span>
         </Link>
-        <Link href="/category/excel" className={`flex flex-col items-center ${pathname.includes('excel') ? 'text-primary' : 'text-on-surface-variant'}`}>
-          <span className="material-symbols-outlined text-2xl">menu_book</span>
-          <span className="text-[10px] mt-1 font-bold uppercase tracking-widest">Modules</span>
+        <Link href="/category/financial-reporting" className={`flex flex-col items-center ${pathname.includes('financial-reporting') ? 'text-primary' : 'text-on-surface-variant'}`}>
+          <span className="material-symbols-outlined text-2xl" style={pathname.includes('financial-reporting') ? {fontVariationSettings: "'FILL' 1"} : {}}>menu_book</span>
+          <span className={`text-[10px] mt-1 uppercase tracking-widest ${pathname.includes('financial-reporting') ? 'font-black' : 'font-bold'}`}>Modules</span>
         </Link>
         <Link href="/admin" className={`flex flex-col items-center ${pathname === '/admin' ? 'text-primary' : 'text-on-surface-variant'}`}>
           <span className="material-symbols-outlined text-2xl">settings</span>
