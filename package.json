@@ -8,7 +8,8 @@
 
     "start": "next start",
     "lint": "eslint",
-    "admin:set": "bun run scripts/set_admin.ts"
+    "admin:set": "bun run scripts/set_admin.ts",
+    "ai:start": "bun run scripts/ai_runner.ts"
   },
   "dependencies": {
     "@google/genai": "^1.46.0",
