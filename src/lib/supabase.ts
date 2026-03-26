@@ -9,4 +9,8 @@ if (process.env.NODE_ENV === 'production' && (!process.env.NEXT_PUBLIC_SUPABASE_
   );
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    flowType: 'pkce',
+  },
+});
