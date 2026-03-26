@@ -17,7 +17,8 @@ CREATE TABLE topics (
   
   -- Observability & Orchestration
   idempotency_key UUID DEFAULT uuid_generate_v4(),
-  locked_at TIMESTAMPTZ, -- For Race Condition prevention
+  interaction_id TEXT, -- For Gemini Deep Research tracking
+  locked_at TIMESTAMPTZ, 
   generation_attempts INT DEFAULT 0,
   last_attempt_at TIMESTAMPTZ,
   generation_duration INTERVAL,

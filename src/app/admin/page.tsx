@@ -11,10 +11,11 @@ import {
   BarChart3, 
   Activity,
   Zap,
-  Loader2
+  Loader2,
+  RefreshCcw
 } from 'lucide-react';
 
-import { triggerResearch } from '@/lib/actions/research';
+import { triggerResearch, syncResearchStatus } from '@/lib/actions/research';
 
 export default function AdminDashboard() {
   const [topics, setTopics] = useState<any[]>([]);
@@ -31,6 +32,20 @@ export default function AdminDashboard() {
     const result = await triggerResearch(id);
     if (!result.success) {
       alert(result.error);
+    }
+    await fetchTopics();
+    setProcessingId(null);
+  }
+
+  async function handleSync(id: string) {
+    setProcessingId(id);
+    const result = await syncResearchStatus(id);
+    if (!result.success && result.status !== 'in_progress') {
+      alert(result.error);
+    } else if (result.status === 'completed') {
+      alert('Research Completed!');
+    } else {
+      alert('Still in progress...');
     }
     await fetchTopics();
     setProcessingId(null);
@@ -164,6 +179,16 @@ export default function AdminDashboard() {
                           title="Trigger Generation"
                         >
                           {processingId === topic.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
+                        </button>
+                      )}
+                      {topic.status === 'generating' && (
+                        <button 
+                          onClick={() => handleSync(topic.id)}
+                          disabled={processingId === topic.id}
+                          className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-md transition-all disabled:opacity-50"
+                          title="Sync Status"
+                        >
+                          {processingId === topic.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCcw className="w-4 h-4" />}
                         </button>
                       )}
                       {topic.status === 'generated' && (
